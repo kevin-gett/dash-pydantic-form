@@ -4,6 +4,7 @@ from functools import partial
 from typing import Literal
 
 import dash_mantine_components as dmc
+import feffery_antd_components as fac
 from dash.development.base_component import Component
 from dash_iconify import DashIconify
 
@@ -67,31 +68,26 @@ class AccordionFormLayout(FormLayout):
             kwargs.pop("styles", {}),
         )
         multiple = kwargs.pop("multiple", True)
-        accordion = dmc.Accordion(
-            [
-                dmc.AccordionItem(
-                    [
-                        dmc.AccordionControl(
-                            dmc.Text(
-                                ([DashIconify(icon=section.icon)] if section.icon else []) + [section.name],
-                                style={"display": "flex", "alignItems": "center", "gap": "0.5rem"},
-                                fw=600,
-                            ),
-                        ),
-                        dmc.AccordionPanel(
+        accordion = fac.AntdAccordion(
+            items=[
+                {
+                    "title": section.name, 
+                    'key': uuid.uuid4().hex,
+                    'children': dmc.Container(
+                        children=[
                             self.grid([field_inputs[field] for field in section.fields if field in field_inputs]),
-                        ),
-                    ],
-                    value=section.name,
-                )
+                        ],
+                        fluid=True,
+                    )
+                }
                 for section in self.sections
             ],
-            value=[section.name for section in self.sections if section.default_open]
+            activeKey=[section.name for section in self.sections if section.default_open]
             if multiple
             else next((section.name for section in self.sections if section.default_open), None),
-            styles=accordion_styles,
+            style=accordion_styles,
             id=self.ids.accordion(aio_id, form_id, path),
-            multiple=multiple,
+            accordion=not multiple,
             **kwargs,
         )
 
