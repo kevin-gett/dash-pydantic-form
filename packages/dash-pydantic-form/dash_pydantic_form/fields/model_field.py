@@ -197,19 +197,19 @@ class ModelField(BaseField):
         parent: str = "",
         field_info: FieldInfo,
     ) -> Component:
-        """Model field accordion item render."""
+         """Model field accordion item render."""
         from dash_pydantic_form import ModelForm
 
         title = self.get_title(field_info, field_name=field)
         description = self.get_description(field_info)
         discriminator = get_str_discriminator(field_info)
-        return dmc.Accordion(
-            dmc.AccordionItem(
-                value="item",
-                children=[
-                    dmc.AccordionControl(dmc.Text(title)),
-                    dmc.AccordionPanel(
-                        [
+        return fac.AntdAccordion(
+            items=[
+                {
+                    "title": title, 
+                    'key': uuid.uuid4().hex,
+                    'children': dmc.Container(
+                        children=[
                             *([dmc.Text(description, size="xs", c="dimmed")] * bool(title) * bool(description)),
                             ModelForm(
                                 item=item,
@@ -225,11 +225,11 @@ class ModelField(BaseField):
                                 fields_order=self.fields_order,
                             ),
                         ],
-                    ),
-                ],
-            ),
-            value="item",
-            styles={
+                        fluid=True,
+                    )
+                }
+            ],
+            style={
                 "control": {"padding": "0.5rem"},
                 "label": {"padding": 0},
                 "item": {
@@ -244,10 +244,11 @@ class ModelField(BaseField):
                     "gap": "0.375rem",
                     "padding": "0.125rem 0.5rem 0.5rem",
                 },
+                "--pydf-field-cols": "var(--pydf-form-cols)"
             },
-            style={"--pydf-field-cols": "var(--pydf-form-cols)"},
             className="pydantic-form-field",
         )
+
 
     def _render(  # noqa: PLR0913
         self,
